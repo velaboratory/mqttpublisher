@@ -25,9 +25,11 @@ public class MQTTPublisher : MonoBehaviour
 	public TMP_InputField user;
 	public TMP_InputField pw;
 	public TMP_InputField broker;
+	public TMP_InputField port;
 	public TMP_InputField id;
 	public TMP_InputField rootTopic;
 	public Button startButton;
+	public Toggle sslToggle;
 	bool hasLocationPermission = false;
 	
 	// Start is called before the first frame update
@@ -53,9 +55,11 @@ public class MQTTPublisher : MonoBehaviour
 #endif
 
 		broker.text = PlayerPrefs.GetString("broker", "");
+		port.text = PlayerPrefs.GetString("port", "" + 1883);
 		user.text = PlayerPrefs.GetString("user", "");
 		pw.text = PlayerPrefs.GetString("pw", "");
 		id.text = PlayerPrefs.GetString("id", SystemInfo.deviceUniqueIdentifier);
+		sslToggle.isOn = PlayerPrefs.GetInt("ssl", 0) > 0;
 		rootTopic.text = PlayerPrefs.GetString("root", "mqttpublisher");
 
 
@@ -134,6 +138,8 @@ public class MQTTPublisher : MonoBehaviour
 			pw.interactable = true;
 			rootTopic.interactable = true;
 			id.interactable = true;
+			port.interactable = true;
+			sslToggle.interactable = true;
 			
 		}
 	}
@@ -144,7 +150,14 @@ public class MQTTPublisher : MonoBehaviour
 		
 		try
 		{
-			mqttClient = new MqttClient(broker.text);
+			if (sslToggle.isOn)
+			{
+				mqttClient = new MqttClient(broker.text, int.Parse(port.text), true, null, null, MqttSslProtocols.SSLv3);
+			}
+			else
+			{
+				mqttClient = new MqttClient(broker.text, int.Parse(port.text), false, null, null, MqttSslProtocols.None);
+			}
 			mqttClient.Connect(id.text, user.text, pw.text);
 
 			if (mqttClient.IsConnected)
@@ -152,8 +165,10 @@ public class MQTTPublisher : MonoBehaviour
 				PlayerPrefs.SetString("broker", broker.text);
 				PlayerPrefs.SetString("user", user.text);
 				PlayerPrefs.SetString("pw", pw.text);
-				PlayerPrefs.GetString("id", id.text);
-				PlayerPrefs.GetString("root", rootTopic.text);
+				PlayerPrefs.SetString("id", id.text);
+				PlayerPrefs.SetString("root", rootTopic.text);
+				PlayerPrefs.SetString("port", port.text);
+				PlayerPrefs.SetInt("ssl", sslToggle.isOn ? 1 : 0);
 				buttonText.text = "Stop";
 			}
 			else
@@ -173,10 +188,13 @@ public class MQTTPublisher : MonoBehaviour
 		startButton.interactable = false;
 		broker.interactable = false;
 		user.interactable = false;
+		port.interactable = false;
+		sslToggle.interactable = false;
 		pw.interactable = false;
 		rootTopic.interactable = false;
 		id.interactable = false;
 		startButton.gameObject.SetActive(false);
+
 
 
 
