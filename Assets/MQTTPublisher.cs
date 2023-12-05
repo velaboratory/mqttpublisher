@@ -340,7 +340,7 @@ public class MQTTPublisher : MonoBehaviour
 	{
 		MemoryStream ms = new MemoryStream();
 		BinaryWriter writer = new BinaryWriter(ms);
-		Quaternion q = AttitudeSensor.current.attitude.value;
+		Quaternion q = AttitudeSensor.current.attitude.ReadValue();
 		Quaternion r = Quaternion.Euler(90, 0, 0) * new Quaternion(q.x, q.y, -q.z, -q.w); //switch lh and rh coordinate systems and rotate
 		attitudeVisual.rotation = r;
 		writer.Write(r.x);
@@ -356,7 +356,7 @@ public class MQTTPublisher : MonoBehaviour
 	{
 		MemoryStream ms = new MemoryStream();
 		BinaryWriter writer = new BinaryWriter(ms);
-		Vector3 accel = Accelerometer.current.acceleration.value;
+		Vector3 accel = Accelerometer.current.acceleration.ReadValue();
 		writer.Write(accel.x);
 		writer.Write(accel.y);
 		writer.Write(accel.z);
@@ -373,6 +373,7 @@ public class MQTTPublisher : MonoBehaviour
 		foreach (var finger in Touch.activeFingers)
 		{
 			Vector2 p = finger.currentTouch.screenPosition;
+			writer.Write(finger.index);
 			writer.Write(p.x);
 			writer.Write(p.y);
 			writer.Write(finger.currentTouch.isTap);
@@ -389,7 +390,7 @@ public class MQTTPublisher : MonoBehaviour
 	{
 		MemoryStream ms = new MemoryStream();
 		BinaryWriter writer = new BinaryWriter(ms);
-		Vector3 gyro = Gyroscope.current.angularVelocity.value;
+		Vector3 gyro = Gyroscope.current.angularVelocity.ReadValue();
 		writer.Write(gyro.x);
 		writer.Write(gyro.y);
 		writer.Write(gyro.z);
@@ -400,7 +401,7 @@ public class MQTTPublisher : MonoBehaviour
 	{
 		MemoryStream ms = new MemoryStream();
 		BinaryWriter writer = new BinaryWriter(ms);
-		Vector3 accel = LinearAccelerationSensor.current.acceleration.value;
+		Vector3 accel = LinearAccelerationSensor.current.acceleration.ReadValue();
 		writer.Write(accel.x);
 		writer.Write(accel.y);
 		writer.Write(accel.z);
@@ -412,7 +413,7 @@ public class MQTTPublisher : MonoBehaviour
 	{
 		MemoryStream ms = new MemoryStream();
 		BinaryWriter writer = new BinaryWriter(ms);
-		Vector3 gravity = GravitySensor.current.gravity.value;
+		Vector3 gravity = GravitySensor.current.gravity.ReadValue();
 		writer.Write(gravity.x);
 		writer.Write(gravity.y);
 		writer.Write(gravity.z);
@@ -423,7 +424,7 @@ public class MQTTPublisher : MonoBehaviour
 	void publishLight() {
 		MemoryStream ms = new MemoryStream();
 		BinaryWriter writer = new BinaryWriter(ms);
-		float light = LightSensor.current.lightLevel.value;
+		float light = LightSensor.current.lightLevel.ReadValue();
 		writer.Write(light);
 		mqttClient.Publish(rootTopic.text + "/" + id.text + "/light", ms.ToArray());
 		allSensorsText.text += "Light: " + light + "\n";
@@ -431,7 +432,7 @@ public class MQTTPublisher : MonoBehaviour
 	void publishHumidity() {
 		MemoryStream ms = new MemoryStream();
 		BinaryWriter writer = new BinaryWriter(ms);
-		float humidity = HumiditySensor.current.relativeHumidity.value;
+		float humidity = HumiditySensor.current.relativeHumidity.ReadValue();
 		writer.Write(humidity);
 		mqttClient.Publish(rootTopic.text + "/" + id.text + "/humidity", ms.ToArray());
 		allSensorsText.text += "Humidity: " + humidity + "\n";
@@ -439,7 +440,7 @@ public class MQTTPublisher : MonoBehaviour
 	void publishProximity() {
 		MemoryStream ms = new MemoryStream();
 		BinaryWriter writer = new BinaryWriter(ms);
-		float distance = ProximitySensor.current.distance.value;
+		float distance = ProximitySensor.current.distance.ReadValue();
 		writer.Write(distance);
 		mqttClient.Publish(rootTopic.text + "/" + id.text + "/proximity", ms.ToArray());
 		allSensorsText.text += "Proximity: " + distance + "\n";
@@ -448,7 +449,7 @@ public class MQTTPublisher : MonoBehaviour
 	{
 		MemoryStream ms = new MemoryStream();
 		BinaryWriter writer = new BinaryWriter(ms);
-		float ambientTemperature = AmbientTemperatureSensor.current.ambientTemperature.value;
+		float ambientTemperature = AmbientTemperatureSensor.current.ambientTemperature.ReadValue();
 		writer.Write(ambientTemperature);
 		mqttClient.Publish(rootTopic.text + "/" + id.text + "/temperature", ms.ToArray());
 		allSensorsText.text += "Temperature: " + ambientTemperature + "\n";
@@ -457,7 +458,7 @@ public class MQTTPublisher : MonoBehaviour
 	{
 		MemoryStream ms = new MemoryStream();
 		BinaryWriter writer = new BinaryWriter(ms);
-		Vector3 magneticField = MagneticFieldSensor.current.magneticField.value;
+		Vector3 magneticField = MagneticFieldSensor.current.magneticField.ReadValue();
 		writer.Write(magneticField.x);
 		writer.Write(magneticField.y);
 		writer.Write(magneticField.z);
@@ -468,7 +469,7 @@ public class MQTTPublisher : MonoBehaviour
 	{
 		MemoryStream ms = new MemoryStream();
 		BinaryWriter writer = new BinaryWriter(ms);
-		float atmosphericPressure = PressureSensor.current.atmosphericPressure.value;
+		float atmosphericPressure = PressureSensor.current.atmosphericPressure.ReadValue();
 		writer.Write(atmosphericPressure);
 		mqttClient.Publish(rootTopic.text + "/" + id.text + "/pressure", ms.ToArray());
 		allSensorsText.text += "Pressure: " + atmosphericPressure + "\n";
